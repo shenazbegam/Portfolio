@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #3b82f6;
+            --secondary: #60a5fa;
+            --dark: #1e3a8a;
+            --light: #eff6ff;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+        }
+        
+        .weather-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .condition-icon {
+            filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.1));
+        }
+        
+        .unit-toggle .active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+<body class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-blue-800 mb-2">SkyCast Weather</h1>
+            <p class="text-blue-600">Real-time weather forecasts anywhere in the world</p>
+        </header>
+        
+        <main>
+            <!-- Search Section -->
+            <div class="weather-card p-6 mb-8 relative overflow-hidden">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e74db223-50c6-462c-b01c-09f566b68127.png" alt="Abstract blue sky with scattered white clouds" class="absolute top-0 left-0 w-full h-full object-cover opacity-10 -z-10" />
+                <div class="flex flex-col md:flex-row gap-4">
+                    <input 
+                        type="text" 
+                        id="location-input" 
+                        placeholder="E.g. New York, London, or ZIP: 90210, 10001, 60601" 
+                        class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        autocomplete="off"
+                    >
+                    <button 
+                        id="search-btn" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition duration-200 flex items-center justify-center gap-2"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                        </svg>
+                        Search
+                    </button>
+                </div>
+                <div id="error-message" class="text-red-500 mt-2 text-sm hidden"></div>
+                
+                <div class="unit-toggle flex justify-center mt-4 gap-1">
+                    <button class="unit-btn px-3 py-1 rounded-l-lg border border-gray-300 text-sm" data-unit="metric">°C</button>
+                    <button class="unit-btn px-3 py-1 rounded-r-lg border border-gray-300 text-sm" data-unit="imperial">°F</button>
+                </div>
+            </div>
+            
+            <!-- Current Weather Section -->
+            <div id="current-weather" class="weather-card p-6 mb-8 hidden">
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <div class="lg:w-1/2">
+                        <h2 class="text-2xl font-semibold text-blue-900 mb-6 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span id="location">--</span>
+                        </h2>
+                        
+                        <div class="flex items-center mb-6">
+                            <div id="current-icon" class="condition-icon w-24 h-24">
+                                <!-- Weather icon will be inserted here by JavaScript -->
+                            </div>
+                            <div class="ml-4">
+                                <div id="current-temp" class="text-5xl font-bold text-blue-900">--°</div>
+                                <div id="current-condition" class="text-lg text-gray-600">--</div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <div class="text-sm text-blue-600">FEELS LIKE</div>
+                                <div id="feels-like" class="text-xl font-medium">--°</div>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <div class="text-sm text-blue-600">HUMIDITY</div>
+                                <div id="humidity" class="text-xl font-medium">--%</div>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <div class="text-sm text-blue-600">WIND</div>
+                                <div id="wind" class="text-xl font-medium">-- km/h</div>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <div class="text-sm text-blue-600">PRESSURE</div>
+                                <div id="pressure" class="text-xl font-medium">-- hPa</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="lg:w-1/2">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/ed33ed29-ff18-4023-9efd-d790f5ae00d1.png" alt="Dynamic weather condition illustration based on current location" id="weather-illustration" class="w-full h-auto rounded-lg object-cover" />
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Forecast Section -->
+            <div id="forecast" class="weather-card p-6 hidden">
+                <h2 class="text-2xl font-semibold text-blue-900 mb-6">5-Day Forecast</h2>
+                <div id="forecast-items" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <!-- Forecast items will be inserted here by JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Loading State -->
+            <div id="loading" class="weather-card p-8 hidden">
+                <div class="flex flex-col items-center justify-center gap-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-500 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <p class="text-gray-600">Fetching weather data...</p>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="mt-12 text-center text-gray-500 text-sm">
+            <p>Weather data provided by OpenWeatherMap</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // API Configuration
+            const API_KEY = 'af29a4425eadeb33c4d4fbf8cbaf31ed'; // Replace with your OpenWeatherMap API key
+            let currentUnit = 'metric';
+            
+            // DOM Elements
+            const searchBtn = document.getElementById('search-btn');
+            const locationInput = document.getElementById('location-input');
+            const errorMessage = document.getElementById('error-message');
+            const currentWeather = document.getElementById('current-weather');
+            const forecast = document.getElementById('forecast');
+            const loading = document.getElementById('loading');
+            const unitBtns = document.querySelectorAll('.unit-btn');
+            
+            // Set default unit button active state
+            document.querySelector(`.unit-btn[data-unit="${currentUnit}"]`).classList.add('active');
+            
+            // Event Listeners
+            searchBtn.addEventListener('click', fetchWeatherData);
+            locationInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') fetchWeatherData();
+            });
+            
+            unitBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Skip if already active
+                    if (btn.classList.contains('active')) return;
+                    
+                    // Update active state
+                    unitBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update unit and refresh data
+                    currentUnit = this.dataset.unit;
+                    const currentLocation = document.getElementById('location').textContent;
+                    if (currentLocation !== '--') {
+                        fetchWeatherData(currentLocation);
+                    }
+                });
+            });
+            
+            // Functions
+            function fetchWeatherData(location = null) {
+                const searchLocation = location || locationInput.value.trim();
+                if (!searchLocation) {
+                    showError('Please enter a location');
+                    return;
+                }
+                
+                // Show loading, hide other sections
+                loading.classList.remove('hidden');
+                currentWeather.classList.add('hidden');
+                forecast.classList.add('hidden');
+                errorMessage.classList.add('hidden');
+                
+                // Fetch current weather
+                fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(searchLocation)}&units=${currentUnit}&appid=${API_KEY}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Location not found');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        displayCurrentWeather(data);
+                        // After current weather is displayed, fetch forecast
+                        return fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(searchLocation)}&units=${currentUnit}&appid=${API_KEY}`);
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Forecast not available');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        displayForecast(data);
+                        loading.classList.add('hidden');
+                        currentWeather.classList.remove('hidden');
+                        forecast.classList.remove('hidden');
+                    })
+                    .catch(error => {
+                        showError(error.message);
+                        loading.classList.add('hidden');
+                    });
+            }
+            
+            function displayCurrentWeather(data) {
+                // Location
+                document.getElementById('location').textContent = `${data.name}, ${data.sys.country}`;
+                
+                // Temperature and condition
+                document.getElementById('current-temp').textContent = `${Math.round(data.main.temp)}°${currentUnit === 'metric' ? 'C' : 'F'}`;
+                document.getElementById('current-condition').textContent = data.weather[0].description;
+                
+                // Weather icon
+                const iconContainer = document.getElementById('current-icon');
+                iconContainer.innerHTML = '';
+                const iconImg = document.createElement('img');
+                iconImg.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+                iconImg.alt = data.weather[0].description;
+                iconImg.className = 'w-full h-full';
+                iconContainer.appendChild(iconImg);
+                
+                // Additional data
+                document.getElementById('feels-like').textContent = `${Math.round(data.main.feels_like)}°`;
+                document.getElementById('humidity').textContent = `${data.main.humidity}%`;
+                document.getElementById('wind').textContent = `${Math.round(data.wind.speed)} ${currentUnit === 'metric' ? 'km/h' : 'mph'}`;
+                document.getElementById('pressure').textContent = `${data.main.pressure} hPa`;
+                
+                // Update weather illustration
+                const weatherIllustration = document.getElementById('weather-illustration');
+                const weatherCondition = data.weather[0].main.toLowerCase();
+                weatherIllustration.alt = `${weatherCondition} weather in ${data.name}, ${data.sys.country}`;
+            }
+            
+            function displayForecast(data) {
+                const forecastContainer = document.getElementById('forecast-items');
+                forecastContainer.innerHTML = '';
+                
+                // Filter to get one forecast per day (every 24 hours)
+                const dailyForecasts = [];
+                for (let i = 0; i < data.list.length; i += 8) {
+                    dailyForecasts.push(data.list[i]);
+                }
+                
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                
+                dailyForecasts.forEach(item => {
+                    const date = new Date(item.dt * 1000);
+                    const dayName = days[date.getDay()];
+                    
+                    const forecastItem = document.createElement('div');
+                    forecastItem.className = 'bg-blue-50 p-4 rounded-lg flex flex-col items-center';
+                    
+                    forecastItem.innerHTML = `
+                        <div class="text-lg font-medium text-blue-900">${dayName}</div>
+                        <div class="text-sm text-blue-600 mb-2">${date.getDate()}/${date.getMonth() + 1}</div>
+                        <div class="condition-icon w-16 h-16 my-2">
+                            <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png" 
+                                 alt="${item.weather[0].description}" 
+                                 class="w-full h-full">
+                        </div>
+                        <div class="text-2xl font-bold text-blue-900">
+                            ${Math.round(item.main.temp)}°${currentUnit === 'metric' ? 'C' : 'F'}
+                        </div>
+                        <div class="text-sm text-gray-600 mt-1">${item.weather[0].description}</div>
+                        <div class="grid grid-cols-2 gap-2 mt-2 w-full text-xs">
+                            <div class="flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                </svg>
+                                ${Math.round(item.wind.speed)} ${currentUnit === 'metric' ? 'km/h' : 'mph'}
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                                </svg>
+                                ${item.main.humidity}%
+                            </div>
+                        </div>
+                    `;
+                    
+                    forecastContainer.appendChild(forecastItem);
+                });
+            }
+            
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.classList.remove('hidden');
+                loading.classList.add('hidden');
+            }
+            
+            // Initialize with default location (optional)
+            // fetchWeatherData('10001'); // New York ZIP code
+            // fetchWeatherData('90210'); // Beverly Hills ZIP code
+            // fetchWeatherData('60601'); // Chicago ZIP code
+        });
+    </script>
+</body>
+</html>
+
