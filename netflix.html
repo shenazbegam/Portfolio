@@ -3,291 +3,568 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RedStream - Netflix Clone</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Netflix Clone</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
-        
+        :root {
+            --netflix-red: #e50914;
+            --netflix-black: #141414;
+            --netflix-light-black: #222;
+            --netflix-white: #fff;
+            --netflix-gray: #999;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #141414;
-            color: white;
-            scroll-behavior: smooth;
+            background-color: var(--netflix-black);
+            color: var(--netflix-white);
+        }
+
+        /* Header/Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+            transition: background-color 0.3s;
+        }
+
+        .navbar.scrolled {
+            background-color: var(--netflix-black);
+        }
+
+        .logo {
+            width: 120px;
+            object-fit: contain;
+            fill: var(--netflix-red);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 30px;
         }
         
-        .hero-gradient {
-            background: linear-gradient(to top, rgba(20, 20, 20, 0.8) 0%, rgba(20, 20, 20, 0) 50%, rgba(20, 20, 20, 0.8) 100%);
+        .nav-links {
+            display: flex;
+            gap: 20px;
         }
         
-        .card {
-            transition: all 0.3s ease;
-            transform-origin: center bottom;
+        .nav-links a {
+            color: var(--netflix-white);
+            text-decoration: none;
+            font-size: 0.9rem;
         }
         
-        .card:hover {
-            transform: scale(1.1);
-            z-index: 10;
+        .nav-avatar {
+            width: 40px;
+            object-fit: contain;
+            border-radius: 4px;
         }
-        
-        .card:hover::after {
+
+        /* Hero Section */
+        .hero {
+            height: 70vh;
+            background-position: center center;
+            background-size: cover;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-left: 50px;
+            margin-bottom: 30px;
+        }
+
+        .hero::before {
             content: '';
             position: absolute;
-            bottom: -10px;
+            top: 0;
             left: 0;
             width: 100%;
-            height: 10px;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0.9) 10%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0) 100%);
         }
-        
-        .header-scroll {
-            background-color: rgba(20, 20, 20, 0.95);
-            transition: background-color 0.3s ease;
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 50%;
+            margin-left: 5%;
         }
-        
-        .hero-button {
-            background-color: rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
+
+        .hero-title {
+            font-size: 3rem;
+            margin-bottom: 20px;
         }
-        
-        .hero-button:hover {
-            background-color: rgba(255, 255, 255, 0.3);
+
+        .hero-desc {
+            line-height: 1.4;
+            margin-bottom: 20px;
         }
-        
-        .play-button {
-            background-color: rgba(255, 255, 255, 0.9);
-            color: black;
+
+        .hero-buttons {
+            display: flex;
+            gap: 10px;
         }
-        
-        .play-button:hover {
-            background-color: white;
+
+        .hero-btn {
+            padding: 10px 30px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        
-        .genre-tag {
-            background-color: rgba(51, 51, 51, 0.5);
-            transition: all 0.2s ease;
+
+        .play-btn {
+            background-color: var(--netflix-white);
+            color: var(--netflix-black);
         }
-        
-        .genre-tag:hover {
-            background-color: rgba(51, 51, 51, 0.8);
+
+        .info-btn {
+            background-color: rgba(109, 109, 110, 0.7);
+            color: var(--netflix-white);
+        }
+
+        .hero-btn i {
+            font-size: 1.5rem;
+        }
+
+        /* Rows */
+        .rows-container {
+            padding: 0 50px;
+            margin-bottom: 30px;
+        }
+
+        .row-title {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .row {
+            display: flex;
+            overflow-y: hidden;
+            overflow-x: scroll;
+            padding: 20px 0;
+            scrollbar-width: none; /* Firefox */
+        }
+
+        .row::-webkit-scrollbar {
+            display: none; /* Chrome/Safari/Edge */
+        }
+
+        .movie-card {
+            width: 200px;
+            margin-right: 15px;
+            transition: transform 450ms;
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.08);
+            z-index: 10;
+        }
+
+        .movie-card:hover .movie-poster {
+            opacity: 0.3;
+        }
+
+        .movie-card:hover .movie-info {
+            opacity: 1;
+        }
+
+        .movie-poster {
+            width: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s;
+        }
+
+        .movie-info {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .movie-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.8);
+            color: var(--netflix-black);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+        }
+
+        .control-btn i {
+            font-size: 1rem;
+        }
+
+        .movie-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero {
+                height: 60vh;
+                padding-left: 20px;
+            }
+            
+            .hero-content {
+                max-width: 80%;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .rows-container {
+                padding: 0 20px;
+            }
+            
+            .movie-card {
+                width: 150px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.5rem;
+            }
+            
+            .movie-card {
+                width: 120px;
+            }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="fixed top-0 w-full z-50 flex items-center justify-between px-8 py-3" id="navbar">
-        <div class="flex items-center">
-            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/1c8481f0-707e-4a04-ae71-a16a01a990d6.png" alt="RedStream logo with bold red text on dark background" class="h-8">
-            <div class="ml-6 hidden md:flex space-x-6">
-                <a href="#" class="text-gray-300 hover:text-white">Home</a>
-                <a href="#" class="text-gray-300 hover:text-white">TV Shows</a>
-                <a href="#" class="text-gray-300 hover:text-white">Movies</a>
-                <a href="#" class="text-gray-300 hover:text-white">New & Popular</a>
-                <a href="#" class="text-gray-300 hover:text-white">My List</a>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Official Netflix logo in red color" class="logo">
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#">TV Shows</a>
+                <a href="#">Movies</a>
+                <a href="#">New & Popular</a>
+                <a href="#">My List</a>
             </div>
         </div>
-        <div class="flex items-center space-x-4">
-            <div class="relative">
-                <input type="text" placeholder="Search" class="bg-black bg-opacity-50 text-white px-4 py-1 rounded border border-gray-600 focus:outline-none focus:border-white w-36 md:w-48 transition-all duration-300" id="searchInput">
-                <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </button>
-            </div>
-            <div class="flex items-center space-x-2">
-                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/ab20f9e0-683a-4043-9cd8-4483e7db1f97.png" alt="User profile picture showing a smiling person with short hair" class="h-8 w-8 rounded cursor-pointer">
-            </div>
-        </div>
+        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/72f988ab-68ea-474c-b355-c97269ff0772.png" alt="User profile picture avatar" class="nav-avatar">
     </nav>
 
     <!-- Hero Section -->
-    <section class="relative h-screen w-full overflow-hidden">
-        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/ab1782b6-66eb-48dd-bba8-e3d59b792c01.png" alt="Featured TV show banner of a dystopian future city with neon lights and flying cars" class="w-full h-full object-cover">
-        
-        <div class="absolute bottom-0 left-0 w-full h-1/3 hero-gradient flex flex-col justify-end px-8 pb-16 md:px-16">
-            <h1 class="text-4xl md:text-6xl font-bold mb-4">The Last Astronauts</h1>
-            <p class="text-lg md:text-xl max-w-3xl text-gray-200">In the year 2142, a crew of astronauts returns to Earth after a 50-year mission to find the planet abandoned. Now they must solve the mystery of humanity's disappearance while surviving the dangerous new world left behind.</p>
-            
-            <div class="flex mt-8 space-x-4">
-                <button class="px-6 py-2 rounded play-button flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
-                    </svg>
-                    Play
+    <section class="hero" style="background-image: url('https://image.tmdb.org/t/p/original/9faGSFi5jam6pDWGNd0p8JcJgXQ.jpg');">
+        <div class="hero-content">
+            <h1 class="hero-title">The Witcher</h1>
+            <p class="hero-desc">Geralt of Rivia, a solitary monster hunter, struggles to find his place in a world where people often prove more wicked than beasts.</p>
+            <div class="hero-buttons">
+                <button class="hero-btn play-btn">
+                    <i class="fas fa-play"></i>
+                    <span>Play</span>
                 </button>
-                <button class="px-6 py-2 rounded bg-gray-600 bg-opacity-70 flex items-center hero-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    More Info
+                <button class="hero-btn info-btn">
+                    <i class="fas fa-info-circle"></i>
+                    <span>More Info</span>
                 </button>
             </div>
         </div>
     </section>
 
-    <!-- Content Sections -->
-    <section class="relative z-10 mt-8 pb-20">
-        <div class="px-8 md:px-16">
-            <!-- Continue Watching -->
-            <div class="mb-12">
-                <h2 class="text-xl md:text-2xl font-medium mb-4">Continue Watching</h2>
-                <div class="relative">
-                    <div class="grid grid-flow-col auto-cols-max gap-4 overflow-x-auto pb-4 scrollbar-hide">
-                        <!-- Card 1 -->
-                        <div class="card w-48 relative cursor-pointer">
-                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/4ed0b240-84ed-41d3-919f-d2aa4e8d7f90.png" alt="Suspenseful detective series set in coastal town with stormy weather" class="rounded w-full h-full">
-                            <div class="absolute left-0 top-0 w-full h-8 bg-gradient-to-b from-black to-transparent"></div>
-                            <div class="absolute left-2 top-2 text-xl font-bold">EP 3</div>
-                            <div class="absolute left-0 bottom-0 w-full h-1 bg-gray-600">
-                                <div class="h-full bg-red-600" style="width: 65%"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Card 2 -->
-                        <div class="card w-48 relative cursor-pointer">
-                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/bddaa370-dcac-476d-a69b-7f1e488c1e41.png" alt="Comedy series about a diverse family in New York City" class="rounded w-full h-full">
-                            <div class="absolute left-0 top-0 w-full h-8 bg-gradient-to-b from-black to-transparent"></div>
-                            <div class="absolute left-2 top-2 text-xl font-bold">EP 5</div>
-                            <div class="absolute left-0 bottom-0 w-full h-1 bg-gray-600">
-                                <div class="h-full bg-red-600" style="width: 30%"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Card 3 -->
-                        <div class="card w-48 relative cursor-pointer">
-                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/08a4b900-1a28-45bb-94af-b74bd2ef964c.png" alt="Documentary series about NASA's journey to Mars" class="rounded w-full h-full">
-                            <div class="absolute left-0 top-0 w-full h-8 bg-gradient-to-b from-black to-transparent"></div>
-                            <div class="absolute left-2 top-2 text-xl font-bold">EP 7</div>
-                            <div class="absolute left-0 bottom-0 w-full h-1 bg-gray-600">
-                                <div class="h-full bg-red-600" style="width: 45%"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Card 4 -->
-                        <div class="card w-48 relative cursor-pointer">
-                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/bc02cf83-6eda-463b-93ea-b9e66c87137b.png" alt="Nature documentary series showcasing African wildlife" class="rounded w-full h-full">
-                            <div class="absolute left-0 top-0 w-full h-8 bg-gradient-to-b from-black to-transparent"></div>
-                            <div class="absolute left-2 top-2 text-xl font-bold">EP 2</div>
-                            <div class="absolute left-0 bottom-0 w-full h-1 bg-gray-600">
-                                <div class="h-full bg-red-600" style="width: 15%"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Card 5 -->
-                        <div class="card w-48 relative cursor-pointer">
-                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/38db66f4-fc6c-4a07-8f04-a8be0cd18ff4.png" alt="Sci-fi thriller about hackers fighting corporate corruption" class="rounded w-full h-full">
-                            <div class="absolute left-0 top-0 w-full h-8 bg-gradient-to-b from-black to-transparent"></div>
-                            <div class="absolute left-2 top-2 text-xl font-bold">EP 4</div>
-                            <div class="absolute left-0 bottom-0 w-full h-1 bg-gray-600">
-                                <div class="h-full bg-red-600" style="width: 80%"></div>
-                            </div>
-                        </div>
+    <!-- Rows -->
+    <div class="rows-container">
+        <h2 class="row-title">Trending Now</h2>
+        <div class="row" id="trending-row">
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f6493242-e09e-4477-ae4f-dfa23a901087.png" alt="Movie poster for Squid Game showing mysterious masked figures in pink jumpsuits" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">Squid Game</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
                     </div>
                 </div>
             </div>
-            
-            <!-- Popular on RedStream -->
-            <div class="mb-12">
-                <h2 class="text-xl md:text-2xl font-medium mb-4">Popular on RedStream</h2>
-                <div class="relative">
-                    <div class="grid grid-flow-col auto-cols-max gap-4 overflow-x-auto pb-4 scrollbar-hide">
-                        <div class="card w-48 h-64 relative cursor-pointer">
-                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/728f86da-b436-4513-b315-3f30e6c1fbee.png" alt="Dark fantasy series with knights battling supernatural forces" class="rounded w-full h-full">
-                        </div>
-                        <div class="card w-48 h-64 relative cursor-pointer">
-                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/d9f6b995-fcf1-46ad-aabb-6292cf816d5e.png" alt="Time travel drama with scientists changing historical events" class="rounded w-full h-full">
-                        </div>
-                        <div class="card w-48 h-64 relative cursor-pointer">
-                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/8f3134dc-1283-405c-8a99-814395ac1dd0.png" alt="Gritty crime drama set in 1980s New York" class="rounded w-full h-full">
-                        </div>
-                        <div class="card w-48 h-64 relative cursor-pointer">
-                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/8e3f3b21-155c-4181-a813-e40da9ca8e8c.png" alt="Political thriller about modern whistleblowers" class="rounded w-full h-full">
-                        </div>
-                        <div class="card w-48 h-64 relative cursor-pointer">
-                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/119d24f9-30d2-4ced-a55d-816f17c01a51.png" alt="Archaeology adventure series uncovering lost civilizations" class="rounded w-full h-full">
-                        </div>
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/73928339-a3a8-454d-8e39-3bc7fb5f90d2.png" alt="Movie poster for The Witcher featuring Geralt of Rivia with silver sword" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">The Witcher</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
                     </div>
                 </div>
-                <div class="flex flex-wrap gap-2 mt-4">
-                    <button class="genre-tag px-3 py-1 rounded-full text-sm">Action</button>
-                    <button class="genre-tag px-3 py-1 rounded-full text-sm">Drama</button>
-                    <button class="genre-tag px-3 py-1 rounded-full text-sm">Sci-Fi</button>
-                    <button class="genre-tag px-3 py-1 rounded-full text-sm">Thriller</button>
-                    <button class="genre-tag px-3 py-1 rounded-full text-sm">Documentary</button>
+            </div>
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/bcb3cd5d-184d-4272-8ab4-5bacb507e70a.png" alt="Movie poster for Money Heist showing characters in red jumpsuits and Dali masks" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">Money Heist</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
+                    </div>
                 </div>
             </div>
-            
-            <!-- Trending Now -->
-            <div class="mb-12">
-                <h2 class="text-xl md:text-2xl font-medium mb-4">Trending Now</h2>
-                <div class="relative">
-                    <div class="grid grid-flow-col auto-cols-max gap-4 overflow-x-auto pb-4 scrollbar-hide">
-                        <div class="card w-48 h-72 relative cursor-pointer group">
-                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/73924e8a-1be1-4336-a1c2-e66a66dc9179.png" alt="Speculative science series about potential alien life" class="rounded w-full h-full">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <div class="absolute bottom-0 left-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <p class="text-sm">Watch Season 3 Now</p>
-                            </div>
-                        </div>
-                        <div class="card w-48 h-72 relative cursor-pointer group">
-                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/72a822ce-dfc7-4353-8426-a4f1e51b2294.png" alt="Survival thriller about scientists trapped under Antarctic ice" class="rounded w-full h-full">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <div class="absolute bottom-0 left-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <p class="text-sm">Top 10 in US Today</p>
-                            </div>
-                        </div>
-                        <div class="card w-48 h-72 relative cursor-pointer group">
-                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e96807fa-4115-4930-8056-05ab3e406808.png" alt="Period drama about Hollywood's silent film era" class="rounded w-full h-full">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <div class="absolute bottom-0 left-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <p class="text-sm">96% Match</p>
-                            </div>
-                        </div>
-                        <div class="card w-48 h-72 relative cursor-pointer group">
-                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c99462f5-c47d-4aad-84c9-601b8e5f2977.png" alt="Dystopian series about technological singularity" class="rounded w-full h-full">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <div class="absolute bottom-0 left-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <p class="text-sm">New Episodes Weekly</p>
-                            </div>
-                        </div>
-                        <div class="card w-48 h-72 relative cursor-pointer group">
-                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/cd4c1bfa-407d-4125-982c-54465c19e776.png's+Table" alt="Culinary series featuring innovative chefs worldwide" class="rounded w-full h-full">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <div class="absolute bottom-0 left-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <p class="text-sm">Recommended For You</p>
-                            </div>
-                        </div>
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/afdb1e51-e0b4-4f04-b98f-60094607c656.png" alt="Movie poster for The Crown featuring Queen Elizabeth II in formal attire" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">The Crown</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c1af81bb-c645-421d-901c-e509bc9a14cd.png" alt="Movie poster for Ozark showing ominous lake landscape with money floating" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">Ozark</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/2ea73d59-cc93-4dfe-a278-c8d90883506b.png" alt="Movie poster for Bridgerton showing elegant period-costumed characters" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">Bridgerton</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+
+    <div class="rows-container">
+        <h2 class="row-title">Popular on Netflix</h2>
+        <div class="row" id="popular-row">
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/9abf13eb-6156-4462-ab0f-26770b3adeb7.png" alt="Movie poster for Lucifer featuring a sharply dressed man with devilish grin" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">Lucifer</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/5fd5e54d-6adb-44b5-a9b3-7e2731e9ebf1.png" alt="Movie poster for Peaky Blinders showing Cillian Murphy in peaked cap and suit" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">Peaky Blinders</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c86b5566-5d11-4c9a-9562-9d365614f419.png" alt="Movie poster for Dark showing eerie woods with upside down figure" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">Dark</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/cc06465a-dfb8-4a91-acea-c7cac85fbb26.png" alt="Movie poster for The Queen's Gambit featuring Anya Taylor-Joy as chess prodigy" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">The Queen's Gambit</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/adfa1dab-3cf2-43e6-8e89-64f40e704018.png" alt="Movie poster for You showing Penn Badgley looking ominously at camera" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">You</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/bdfd64d2-1854-4baa-9d34-251ea222b85a.png" alt="Movie poster for Narcos showing Pablo Escobar with piles of money" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">Narcos</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="rows-container">
+        <h2 class="row-title">Continue Watching</h2>
+        <div class="row" id="continue-row">
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/825734c1-0a6d-4bde-8185-f916fc4afd48.png" alt="Movie poster for Breaking Bad showing Walter White in yellow hazmat suit" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">Breaking Bad</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/20678061-c537-4192-8749-d988d79da98a.png" alt="Movie poster for House of Cards showing Kevin Spacey as Frank Underwood breaking the fourth wall" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">House of Cards</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e69c451e-703b-4dc9-a59a-8c74e0feb03b.png" alt="Movie poster for The Umbrella Academy showing colorful umbrella-wielding characters" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">The Umbrella Academy</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/172f1252-ae17-4d92-ab8f-fdf51632d65b.png" alt="Movie poster for Mindhunter showing two FBI agents interviewing a serial killer" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">Mindhunter</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/772c1f03-58ab-4a07-a0a2-16ff59ec7f58.png" alt="Movie poster for The Mandalorian featuring the helmeted bounty hunter with Grogu (Baby Yoda)" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">The Mandalorian</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="movie-card">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/9d554bbc-42f6-4518-a894-b6c28ff4bbed.png" alt="Movie poster for Wednesday featuring Jenna Ortega as Wednesday Addams with her signature braids" class="movie-poster">
+                <div class="movie-info">
+                    <h3 class="movie-title">Wednesday</h3>
+                    <div class="movie-controls">
+                        <button class="control-btn"><i class="fas fa-play"></i></button>
+                        <button class="control-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // Header scroll effect
-        window.addEventListener('scroll', function() {
-            const navbar = document.getElementById('navbar');
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
             if (window.scrollY > 100) {
-                navbar.classList.add('header-scroll');
+                document.querySelector('.navbar').classList.add('scrolled');
             } else {
-                navbar.classList.remove('header-scroll');
+                document.querySelector('.navbar').classList.remove('scrolled');
             }
         });
 
-        // Card hover details
-        const cards = document.querySelectorAll('.card');
-        cards.forEach(card => {
-            card.addEventListener('mouseover', function() {
-                // Any card-specific interactions can go here
+        // Simple autoscroll for rows
+        const rows = document.querySelectorAll('.row');
+        
+        rows.forEach(row => {
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+            
+            row.addEventListener('mousedown', (e) => {
+                isDown = true;
+                startX = e.pageX - row.offsetLeft;
+                scrollLeft = row.scrollLeft;
+            });
+            
+            row.addEventListener('mouseleave', () => {
+                isDown = false;
+            });
+            
+            row.addEventListener('mouseup', () => {
+                isDown = false;
+            });
+            
+            row.addEventListener('mousemove', (e) => {
+                if(!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - row.offsetLeft;
+                const walk = (x - startX) * 2;
+                row.scrollLeft = scrollLeft - walk;
             });
         });
 
-        // Search functionality
-        const searchInput = document.getElementById('searchInput');
-        searchInput.addEventListener('keyup', function(e) {
-            if (e.key === 'Enter') {
-                alert('Search functionality would be implemented here!');
-            }
+        // Movie hover effect with play button animation
+        const movieCards = document.querySelectorAll('.movie-card');
+        
+        movieCards.forEach(card => {
+            const playBtn = card.querySelector('.fa-play').parentElement;
+            
+            card.addEventListener('mouseenter', () => {
+                playBtn.style.transform = 'scale(1.1)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                playBtn.style.transform = 'scale(1)';
+            });
         });
     </script>
 </body>
